@@ -1,0 +1,14 @@
+{
+	"src_path"    : "/tmp/data/",
+	"crop_path"   : "/tmp/crop/",
+	"dest_path"   : "/tmp/output/",
+	"img_suffix"  : "jpg",
+	"thread_cnt"  : 2,
+	"multi_face"  : 0,
+	"face_crop"   : 1,
+	"model_path"  : "/tmp/seeta/model/",
+	"log_path"    : "/tmp/",
+	"mean_shape"  : 256,
+	"final_size"  : 256,
+	"pthfn_lst"   : ""
+}

@@ -1,0 +1,1 @@
+model files [seeta_fd_frontal_v1.0.bin], [seeta_fa_v1.1.bin] should be put here
