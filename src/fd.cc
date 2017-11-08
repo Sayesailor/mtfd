@@ -1,9 +1,11 @@
+// Copyright 2017-2018 SeetaTech
+#include "include/fd.h"
+#include <VIPLFaceDetector.h>
 #include <unistd.h>
 #include <string>
-#include <eupulogger4system.h>
-#include <face_detection.h>
-#include "fd.h"
-#include "config.h"
+#include <memory>
+#include "include/config.h"
+#include "include/eupulogger4system.h"
 
 bool Fd::init(const std::string &fd_mod_file, const std::string &pt_mod_file) {
     bool ret = false;
@@ -17,19 +19,16 @@ bool Fd::init(const std::string &fd_mod_file, const std::string &pt_mod_file) {
             break;
         }
 
-        if (fd_detector_) delete fd_detector_;
-        fd_detector_ = NULL;
-        fd_detector_ = new seeta::FaceDetection(fd_model_filename.c_str());
+        fd_detector_.reset(new VIPLFaceDetector(fd_model_filename.c_str()));
         if (!fd_detector_) {
-            LOG(_ERROR_, "Fd::init() new seeta::FaceDetection(%s) failed",
+            LOG(_ERROR_, "Fd::init() new VIPLFaceDetector(%s) failed",
                 fd_model_filename.c_str());
             break;
         }
 
-        fd_detector_->SetMinFaceSize(40);
-        fd_detector_->SetScoreThresh(2.0f);
-        fd_detector_->SetImagePyramidScaleFactor(0.8f);
-        fd_detector_->SetWindowStep(4, 4);
+        fd_detector_->SetMinFaceSize(60);
+        fd_detector_->SetScoreThresh(0.7f, 0.7f, 0.85f);
+        fd_detector_->SetImagePyramidScaleFactor(1.414f);
 
         if (access(pt_model_filename.c_str(), R_OK) == -1) {
             LOG(_ERROR_, "Fd::init() access(%s) return -1",
@@ -37,24 +36,15 @@ bool Fd::init(const std::string &fd_mod_file, const std::string &pt_mod_file) {
             break;
         }
 
-        if (pt_detector_) delete pt_detector_;
-        pt_detector_ = NULL;
-        pt_detector_ = new seeta::FaceAlignment(pt_model_filename.c_str());
+        pt_detector_.reset(new VIPLPointDetector(pt_model_filename.c_str()));
         if (!pt_detector_) {
-            LOG(_ERROR_, "Fd::init() new seeta::FaceDetection(%s) failed",
+            LOG(_ERROR_, "Fd::init() new VIPLPointDetector(%s) failed",
                 pt_model_filename.c_str());
             break;
         }
 
         ret = true;
     } while (0);
-
-    if (ret == false) {
-        if (fd_detector_) delete fd_detector_;
-        if (pt_detector_) delete pt_detector_;
-        fd_detector_ = NULL;
-        pt_detector_ = NULL;
-    }
 
     return ret;
 }

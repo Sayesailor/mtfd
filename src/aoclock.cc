@@ -1,6 +1,8 @@
-#include "aoclock.h"
+// Copyright 2017-2018 SeetaTech
 
-AocLock::AocLock() { pthread_mutex_init(&mutex_, NULL); }
+#include "include/aoclock.h"
+
+AocLock::AocLock() { pthread_mutex_init(&mutex_, nullptr); }
 
 AocLock::~AocLock() { pthread_mutex_destroy(&mutex_); }
 

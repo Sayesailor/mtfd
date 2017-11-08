@@ -1,25 +1,29 @@
-#ifndef MTFD_INCLUDE_FD_H_
-#define MTFD_INCLUDE_FD_H_
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
 
-#include <face_detection.h>
-#include <face_alignment.h>
+#ifndef INCLUDE_FD_H_
+#define INCLUDE_FD_H_
+
+#include <VIPLFaceDetector.h>
+#include <VIPLPointDetector.h>
+#include <VIPLStruct.h>
+#include <memory>
+#include <string>
 
 class Fd {
    public:
-    Fd() : fd_detector_(NULL), pt_detector_(NULL) {}
-    virtual ~Fd() {
-        if (fd_detector_) delete fd_detector_;
-        if (pt_detector_) delete pt_detector_;
-    }
+    Fd() {}
+    virtual ~Fd() {}
 
     bool init(const std::string &fd_model_filename,
               const std::string &pt_model_filename);
-    seeta::FaceDetection *get_fd_detector() { return fd_detector_; }
-    seeta::FaceAlignment *get_pt_detector() { return pt_detector_; }
+    VIPLFaceDetector *get_fd_detector() { return fd_detector_.get(); }
+    VIPLPointDetector *get_pt_detector() { return pt_detector_.get(); }
 
    private:
-    seeta::FaceDetection *fd_detector_;
-    seeta::FaceAlignment *pt_detector_;
+    std::unique_ptr<VIPLFaceDetector> fd_detector_;
+    std::unique_ptr<VIPLPointDetector> pt_detector_;
 };
 
-#endif
+#endif  // INCLUDE_FD_H_

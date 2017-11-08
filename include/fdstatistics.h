@@ -1,18 +1,23 @@
-#ifndef MTFD_INCLUDE_FDSTATISTICS_H_
-#define MTFD_INCLUDE_FDSTATISTICS_H_
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
 
-#include "aocsingleton.h"
+#ifndef INCLUDE_FDSTATISTICS_H_
+#define INCLUDE_FDSTATISTICS_H_
+
+#include "include/aocsingleton.h"
 
 class FdStatistics : public IAocSingleton<FdStatistics> {
    public:
     void output();
-    void inc_src_cnt(int n = 1) { src_cnt_ += n; };
-    void inc_dest_cnt(int n = 1) { dest_cnt_ += n; };
-    void inc_multi_face_cnt(int n = 1) { multi_face_cnt_ += n; };
-    void inc_err_cnt(int n = 1) { err_cnt_ += n; };
+    void clear();
+    void inc_src_cnt(int n = 1) { src_cnt_ += n; }
+    void inc_dest_cnt(int n = 1) { dest_cnt_ += n; }
+    void inc_multi_face_cnt(int n = 1) { multi_face_cnt_ += n; }
+    void inc_err_cnt(int n = 1) { err_cnt_ += n; }
 
-    int get_src_cnt() { return src_cnt_; };
-    int get_dest_cnt() { return dest_cnt_; };
+    int get_src_cnt() { return src_cnt_; }
+    int get_dest_cnt() { return dest_cnt_; }
 
    private:
     FdStatistics();
@@ -28,4 +33,4 @@ class FdStatistics : public IAocSingleton<FdStatistics> {
     int err_cnt_;
 };
 
-#endif
+#endif  // INCLUDE_FDSTATISTICS_H_

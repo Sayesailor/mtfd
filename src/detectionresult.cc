@@ -1,19 +1,18 @@
-#include "detectionresult.h"
-#include <iostream>
+// Copyright 2017-2018 SeetaTech
+
+#include "include/detectionresult.h"
 #include <fstream>
+#include <iostream>
 
-void DetectionResult::set_fi(const seeta::FaceInfo &fi) { fi_ = fi; }
+void DetectionResult::set_fi(const VIPLFaceInfo &fi) { fi_ = fi; }
 
-seeta::FaceInfo DetectionResult::get_fi() { return fi_; }
+VIPLFaceInfo DetectionResult::get_fi() { return fi_; }
 
-void DetectionResult::set_flmks(
-    const std::vector<seeta::FacialLandmark> &flmks) {
+void DetectionResult::set_flmks(const std::vector<VIPLPoint> &flmks) {
     flmks_ = flmks;
 }
 
-std::vector<seeta::FacialLandmark> DetectionResult::get_flmks() {
-    return flmks_;
-}
+std::vector<VIPLPoint> DetectionResult::get_flmks() { return flmks_; }
 
 void DetectionResult::set_filename(const std::string &filename) {
     filename_ = filename;
@@ -22,8 +21,8 @@ void DetectionResult::set_filename(const std::string &filename) {
 std::string DetectionResult::get_filename() { return filename_; }
 
 void DetectionResult::output(std::ofstream &outfile) {
-    outfile << filename_.c_str() << " " << fi_.bbox.x << " " << fi_.bbox.y
-            << " " << fi_.bbox.width << " " << fi_.bbox.height << " ";
+    outfile << filename_.c_str() << " " << fi_.x << " " << fi_.y << " "
+            << fi_.width << " " << fi_.height << " ";
 
     for (auto it_flmks : flmks_)
         outfile << "(" << it_flmks.x << "," << it_flmks.y << ")";

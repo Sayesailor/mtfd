@@ -1,7 +1,7 @@
 <BR>there are 3rd libs request:
-<BR>libseeta_facedet_lib libseeta_fa_lib libopencv_core libopencv_highgui libopencv_imgproc libopencv_imgcodecs libjsoncpp libpthread liblog4cxx libuuid
+<BR>VIPLFaceDetector500 VIPLPointDetector500 libopencv_core libopencv_highgui libopencv_imgproc libopencv_imgcodecs libjsoncpp libpthread liblog4cxx libuuid
 <BR>
-<BR>make HAVELOG=-DWITH_LOG4CXX FILECONF=-DWITH_FILECONF
+<BR>make HAVELOG=-DWITH_LOG4CXX OUTPUT_TARGET=-DSHARED_LIB FILECONF=-DWITH_FILECONF
 <BR>
 <BR>mkdir build
 <BR>cd build

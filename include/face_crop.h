@@ -1,7 +1,11 @@
-#ifndef _VIPL_FACE_CROP_H
-#define _VIPL_FACE_CROP_H
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
 
-#include "vipl_struct.h"
+#ifndef INCLUDE_FACE_CROP_H_
+#define INCLUDE_FACE_CROP_H_
+
+#include <VIPLStruct.h>
 
 namespace VIPL {
 enum CROP_METHOD { BY_LINEAR, BY_BICUBIC };
@@ -16,6 +20,6 @@ VIPL_API bool FaceCrop(const VIPLImageData &src_img, VIPLImageData &dst_img,
                        const VIPLPoint *mean_shape, int mean_shape_size,
                        CROP_METHOD method = BY_LINEAR,
                        VIPLPoint *final_points = nullptr, int final_size = -1);
-}
+}  // namespace VIPL
 
-#endif
+#endif  // INCLUDE_FACE_CROP_H_

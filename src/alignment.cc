@@ -1,11 +1,12 @@
-#include "alignment.h"
+// Copyright 2017-2018 SeetaTech
 
-#include <cstring>
-#include <memory>
+#include "include/alignment.h"
 #include <algorithm>
-#include <vector>
-#include <numeric>
+#include <cstring>
 #include <functional>
+#include <memory>
+#include <numeric>
+#include <vector>
 
 template <typename T>
 void CopyData(T *dst, const T *src, size_t _count) {
@@ -23,7 +24,7 @@ static bool transformation_maker(int crop_width, int crop_height,
                                  const float *mean_shape, int mean_shape_width,
                                  int mean_shape_height, double *transformation,
                                  int N = 1) {
-    std::unique_ptr<float> raw_std_points(new float[points_num * 2]);
+    std::unique_ptr<float[]> raw_std_points(new float[points_num * 2]);
     float *std_points = raw_std_points.get();
     for (int i = 0; i < points_num; ++i) {
         std_points[i * 2] = mean_shape[i * 2] * crop_width / mean_shape_width;
@@ -100,7 +101,6 @@ static inline double Cubic(double x) {
 static inline void Norm(std::vector<double> &weights) {
     double sum = 0;
     for (double w : weights) sum += w;
-    ;
     for (double &w : weights) w /= sum;
 }
 
@@ -114,7 +114,7 @@ static void sampling(const uint8_t *image_data, int image_width,
                      std::vector<int> &indices_x, std::vector<int> &indices_y,
                      SAMPLING_TYPE type = LINEAR) {
     if (type == LINEAR) {
-        // bilinear subsampling
+        //  bilinear subsampling
         int ux = static_cast<int>(floor(x)), uy = static_cast<int>(floor(y));
         if (ux >= 0 && ux < image_height - 1 && uy >= 0 &&
             uy < image_width - 1) {
@@ -140,21 +140,23 @@ static void sampling(const uint8_t *image_data, int image_width,
             memset(pixel, 0, sizeof(uint8_t) * image_channels);
         }
     } else if (type == BICUBIC) {
-        // bicubic subsampling
+        //  bicubic subsampling
         if (x >= 0 && x < image_height && y >= 0 && y < image_width) {
-            scale = std::min<double>(scale, double(1.0));
+            scale = std::min<double>(scale, static_cast<double>(1.0));
             double kernel_width = std::max<double>(
                 BICUBIC_KERNEL,
-                BICUBIC_KERNEL / scale);  // bicubic kernel width
-            // std::vector<double> weights_x, weights_y;
-            // std::vector<int>  indices_x, indices_y;
-            // weights_x.reserve(kernel_width), indices_x.reserve(kernel_width);
-            // weights_y.reserve(kernel_width), indices_y.reserve(kernel_width);
+                BICUBIC_KERNEL / scale);  //  bicubic kernel width
+            //  std::vector<double> weights_x, weights_y;
+            //  std::vector<int>  indices_x, indices_y;
+            //  weights_x.reserve(kernel_width),
+            //  indices_x.reserve(kernel_width);
+            //  weights_y.reserve(kernel_width),
+            //  indices_y.reserve(kernel_width);
             weights_x.clear();
             indices_x.clear();
             weights_y.clear();
             indices_y.clear();
-            // get indices and weight along x axis
+            //  get indices and weight along x axis
             int ux_left =
                 std::max<int>(0, static_cast<int>(ceil(x - kernel_width / 2)));
             int ux_right =
@@ -162,22 +164,22 @@ static void sampling(const uint8_t *image_data, int image_width,
                               static_cast<int>(floor(x + kernel_width / 2)));
             for (int ux = ux_left; ux <= ux_right; ++ux) {
                 double weight = Cubic((x - ux) * scale);
-                // if (weight == 0) continue;
+                //  if (weight == 0) continue;
                 indices_x.push_back(ux);
                 weights_x.push_back(weight);
             }
-            // get indices and weight along y axis
+            //  get indices and weight along y axis
             int uy_left =
                 std::max<int>(0, static_cast<int>(ceil(y - kernel_width / 2)));
             int uy_right = std::min<int>(
                 image_width - 1, static_cast<int>(floor(y + kernel_width / 2)));
             for (int uy = uy_left; uy <= uy_right; ++uy) {
                 double weight = Cubic((y - uy) * scale);
-                // if (weight == 0) continue;
+                //  if (weight == 0) continue;
                 indices_y.push_back(uy);
                 weights_y.push_back(weight);
             }
-            // normalize the weights
+            //  normalize the weights
             Norm(weights_x);
             Norm(weights_y);
             size_t lx = weights_x.size(), ly = weights_y.size();
@@ -219,14 +221,14 @@ static bool spatial_transform(const uint8_t *image_data, int image_width,
                               int pad_left = 0, int pad_right = 0,
                               SAMPLING_TYPE type = LINEAR, int N = 1) {
     const double *theta_data = transformation;
-    // int src_w = image_width;
-    // int src_h = image_height;
+    //  int src_w = image_width;
+    //  int src_h = image_height;
     int channels = image_channels;
     int dst_h = crop_height + pad_top + pad_bottom;
     int dst_w = crop_width + pad_left + pad_right;
     uint8_t *output_data = crop_data;
 
-    // bool normalized_tform_ = false;	// @todo it does not work now
+    //  bool normalized_tform_ = false;  //  @todo it does not work now
 
     std::vector<double> weights_x, weights_y;
     std::vector<int> indices_x, indices_y;
@@ -236,25 +238,25 @@ static bool spatial_transform(const uint8_t *image_data, int image_width,
             sqrt(theta_data[0] * theta_data[0] + theta_data[3] * theta_data[3]);
         for (int x = 0; x < dst_h; ++x)
             for (int y = 0; y < dst_w; ++y) {
-                // Convet the point into crop axis
+                //  Convet the point into crop axis
                 int bx = x - pad_top;
                 int by = y - pad_left;
-                // Get the source position of each point on the destination
-                // feature map.
+                //  Get the source position of each point on the destination
+                //  feature map.
                 double src_y =
                     theta_data[0] * by + theta_data[1] * bx + theta_data[2];
                 double src_x =
                     theta_data[3] * by + theta_data[4] * bx + theta_data[5];
-                // if (normalized_tform_) {
-                //	double tmp_y = (by * 2.0 + 1.0) / dst_w - 1.0;
-                //	double tmp_x = (bx * 2.0 + 1.0) / dst_h - 1.0;
-                //	src_y = theta_data[0] * tmp_y + theta_data[1] * tmp_x +
-                //	theta_data[2];
-                //	src_x = theta_data[3] * tmp_y + theta_data[4] * tmp_x +
-                //	theta_data[5];
-                //	src_y = ((src_y + 1) * src_w - 1.0) / 2.0;
-                //	src_x = ((src_x + 1) * src_h - 1.0) / 2.0;
-                //}
+                //  if (normalized_tform_) {
+                //  double tmp_y = (by * 2.0 + 1.0) / dst_w - 1.0;
+                //  double tmp_x = (bx * 2.0 + 1.0) / dst_h - 1.0;
+                //  src_y = theta_data[0] * tmp_y + theta_data[1] * tmp_x +
+                //  theta_data[2];
+                //  src_x = theta_data[3] * tmp_y + theta_data[4] * tmp_x +
+                //  theta_data[5];
+                //  src_y = ((src_y + 1) * src_w - 1.0) / 2.0;
+                //  src_x = ((src_x + 1) * src_h - 1.0) / 2.0;
+                //  }
                 uint8_t *current_channel_data =
                     &output_data[n * dst_h * dst_w * channels +
                                  x * dst_w * channels + y * channels];

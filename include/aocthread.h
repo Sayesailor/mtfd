@@ -1,10 +1,12 @@
-/* why aoc prefix? cause there are many thread frameworks,
+/* Copyright 2017-2018 SeetaTech
+ *
+ * why aoc prefix? cause there are many thread frameworks,
  * so prefix aoc be added, distinguish from the standard ones,
  * it comes from LOGO of a led-display at frond of me.
  */
 
-#ifndef MTFD_INCLUDE_AOCTHREAD_H_
-#define MTFD_INCLUDE_AOCTHREAD_H_
+#ifndef INCLUDE_AOCTHREAD_H_
+#define INCLUDE_AOCTHREAD_H_
 
 #include <pthread.h>
 #include <signal.h>
@@ -35,4 +37,4 @@ class AocThread {
     bool is_exit_;
 };
 
-#endif
+#endif  // INCLUDE_AOCTHREAD_H_

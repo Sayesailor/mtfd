@@ -1,21 +1,23 @@
-#include <unistd.h>
-#include <sys/time.h>
-#include <eupulogger4system.h>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <uuid/uuid.h>
-#include <iostream>
-#include <fstream>
-#include "workbasethread.h"
-#include "fdthread.h"
-#include "fd.h"
-#include "face_crop.h"
-#include "fdstatistics.h"
+// Copyright 2017-2018 SeetaTech
 
-FdThread::FdThread(int id) : WorkBaseThread(), id_(id), pcfg_(NULL) {
+#include "include/fdthread.h"
+#include <sys/time.h>
+#include <unistd.h>
+#include <uuid/uuid.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <fstream>
+#include <iostream>
+#include "include/eupulogger4system.h"
+#include "include/face_crop.h"
+#include "include/fdstatistics.h"
+#include "include/workbasethread.h"
+
+FdThread::FdThread(int id) : WorkBaseThread(), id_(id), pcfg_(nullptr) {
     LOG(_INFO_, "FdThread::FdThread(%d)", id_);
-    if (!fd_.init("/seeta_fd_frontal_v1.0.bin", "/seeta_fa_v1.1.bin"))
+    if (!fd_.init("/VIPLFaceDetector5.0.0.dat",
+                  "/VIPLPointDetector5.0.pts5.dat"))
         LOG(_ERROR_, "FdThread::FdThread() fd_.init() failed");
     pcfg_ = Config::get_instance();
 }
@@ -31,7 +33,7 @@ int FdThread::process_task() {
 
 int FdThread::do_face_detect() {
     drs_.clear();
-    seeta::FaceDetection *pfd = fd_.get_fd_detector();
+    VIPLFaceDetector *pfd = fd_.get_fd_detector();
     if (!pfd) {
         LOG(_ERROR_,
             "FdThread::do_face_detect() fd_.get_fd_detector() failed, id = %d",
@@ -47,7 +49,6 @@ int FdThread::do_face_detect() {
             if (access(it_fn.c_str(), R_OK) == -1) break;
 
             cv::Mat mat;
-            cv::Mat mat_gray;
             try {
                 mat = cv::imread(it_fn.c_str(), cv::IMREAD_UNCHANGED);
                 if (!mat.data) {
@@ -56,8 +57,6 @@ int FdThread::do_face_detect() {
                         it_fn.c_str());
                     continue;
                 }
-
-                cv::cvtColor(mat, mat_gray, cv::COLOR_BGR2GRAY);
             } catch (...) {
                 LOG(_ERROR_,
                     "FdThread::do_face_detect() cv::imread() EXCEPTION, image "
@@ -66,11 +65,10 @@ int FdThread::do_face_detect() {
                 continue;
             }
 
-            seeta::ImageData seeta_img_gray(mat_gray.cols, mat_gray.rows,
-                                            mat_gray.channels());
-            seeta_img_gray.data = mat_gray.data;
+            VIPLImageData seeta_img_gray(mat.cols, mat.rows, mat.channels());
+            seeta_img_gray.data = mat.data;
 
-            std::vector<seeta::FaceInfo> faces = pfd->Detect(seeta_img_gray);
+            std::vector<VIPLFaceInfo> faces = pfd->Detect(seeta_img_gray);
 
             if (faces.size() > 1)
                 FdStatistics::get_instance()->inc_multi_face_cnt();
@@ -90,8 +88,7 @@ int FdThread::do_face_detect() {
                 continue;
 
             std::string fn = it_fn;
-            deal_faces_for_each_img(mat, mat_gray, faces, fn);
-
+            deal_faces_for_each_img(mat, mat, faces, fn);
         } while (0);
 
         if (!is_started()) break;
@@ -102,16 +99,17 @@ int FdThread::do_face_detect() {
     return 0;
 }
 
-void FdThread::deal_faces_for_each_img(
-    const cv::Mat &mat, const cv::Mat &mat_gray,
-    const std::vector<seeta::FaceInfo> &faces, const std::string &fn) {
+void FdThread::deal_faces_for_each_img(const cv::Mat &mat,
+                                       const cv::Mat &mat_gray,
+                                       const std::vector<VIPLFaceInfo> &faces,
+                                       const std::string &fn) {
     VIPLImageData vipl_img(mat.cols, mat.rows, mat.channels());
     vipl_img.data = mat.data;
-    seeta::ImageData seeta_img_gray(mat_gray.cols, mat_gray.rows,
-                                    mat_gray.channels());
-    seeta_img_gray.data = mat_gray.data;
+    // VIPLImageData seeta_img_gray(mat_gray.cols, mat_gray.rows,
+    //                                mat_gray.channels());
+    // seeta_img_gray.data = mat_gray.data;
 
-    seeta::FaceAlignment *pfa = fd_.get_pt_detector();
+    VIPLPointDetector *pfa = fd_.get_pt_detector();
     if (!pfa) {
         LOG(_ERROR_,
             "FdThread::do_face_detect() fd_.get_pt_detector() failed, id = %d",
@@ -121,8 +119,8 @@ void FdThread::deal_faces_for_each_img(
 
     cropid_ = 0;
     for (auto it_face : faces) {
-        std::vector<seeta::FacialLandmark> flmks(DetectionResult::FLMKS_CNT);
-        pfa->PointDetectLandmarks(seeta_img_gray, it_face, &flmks[0]);
+        std::vector<VIPLPoint> flmks(DetectionResult::FLMKS_CNT);
+        pfa->DetectLandmarks(/*seeta_img_gray*/ vipl_img, it_face, &flmks[0]);
 
         if (flmks.size() == 0) continue;
 
@@ -176,12 +174,19 @@ void FdThread::do_face_crop(const VIPLImageData &vipl_img,
 
     char buf[PATH_MAX] = {0};
     if (pcfg_->get_multi_face() == 1)
-        sprintf(buf, "%s_%02d.%s",
-                crop_fn.substr(0, crop_fn.rfind(".")).c_str(), cropid_++,
-                pcfg_->get_img_suffix().c_str());
+#ifdef IMG_SUFF
+        snprintf(buf, PATH_MAX, "%s_%02d.%s",
+                 crop_fn.substr(0, crop_fn.rfind(".")).c_str(), cropid_++,
+                 pcfg_->get_img_suffix().c_str());
+#else
+        {}
+#endif
     else
-        sprintf(buf, "%s", crop_fn.c_str());
-    cv::imwrite(buf, mat_crop);
+        snprintf(buf, PATH_MAX, "%s", crop_fn.c_str());
+    if (!cv::imwrite(buf, mat_crop)) {
+        const std::string kk = "";
+        cv::imwrite(buf, mat_crop);
+    }
 }
 
 void FdThread::output() {

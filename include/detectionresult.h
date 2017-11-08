@@ -1,16 +1,21 @@
-#ifndef MTFD_INCLUDE_DETECTIONRESULT_H_
-#define MTFD_INCLUDE_DETECTIONRESULT_H_
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
 
-#include <string>
+#ifndef INCLUDE_DETECTIONRESULT_H_
+#define INCLUDE_DETECTIONRESULT_H_
+
+#include <VIPLFaceDetector.h>
 #include <fstream>
-#include <face_detection.h>
+#include <string>
+#include <vector>
 
 class DetectionResult {
    public:
-    void set_fi(const seeta::FaceInfo& fi);
-    seeta::FaceInfo get_fi();
-    void set_flmks(const std::vector<seeta::FacialLandmark>& flmks);
-    std::vector<seeta::FacialLandmark> get_flmks();
+    void set_fi(const VIPLFaceInfo& fi);
+    VIPLFaceInfo get_fi();
+    void set_flmks(const std::vector<VIPLPoint>& flmks);
+    std::vector<VIPLPoint> get_flmks();
     void set_filename(const std::string& filename);
     std::string get_filename();
 
@@ -20,9 +25,9 @@ class DetectionResult {
     static const int FLMKS_CNT = 5;
 
    private:
-    seeta::FaceInfo fi_;
-    std::vector<seeta::FacialLandmark> flmks_;
+    VIPLFaceInfo fi_;
+    std::vector<VIPLPoint> flmks_;
     std::string filename_;
 };
 
-#endif
+#endif  // INCLUDE_DETECTIONRESULT_H_

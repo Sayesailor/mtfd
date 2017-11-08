@@ -1,7 +1,11 @@
-#ifndef MTFD_INCLUDE_WORKBASETHREAD_H_
-#define MTFD_INCLUDE_WORKBASETHREAD_H_
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
 
-#include "aocthread.h"
+#ifndef INCLUDE_WORKBASETHREAD_H_
+#define INCLUDE_WORKBASETHREAD_H_
+
+#include "include/aocthread.h"
 
 class WorkBaseThread : public AocThread {
    public:
@@ -17,4 +21,4 @@ class WorkBaseThread : public AocThread {
     virtual int process_task() = 0;
 };
 
-#endif
+#endif  // INCLUDE_WORKBASETHREAD_H_

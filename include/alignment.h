@@ -1,5 +1,9 @@
-#ifndef _SEETA_COMMON_ALIGNMENT_H
-#define _SEETA_COMMON_ALIGNMENT_H
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
+
+#ifndef INCLUDE_ALIGNMENT_H_
+#define INCLUDE_ALIGNMENT_H_
 #include <cstdint>
 
 enum SAMPLING_TYPE { LINEAR, BICUBIC };
@@ -13,4 +17,4 @@ bool face_crop_core(const uint8_t *image_data, int image_width,
                     int pad_right = 0, float *final_points = nullptr,
                     SAMPLING_TYPE type = LINEAR);
 
-#endif  // _SEETA_COMMON_ALIGNMENT_H
+#endif  // INCLUDE_ALIGNMENT_H_

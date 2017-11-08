@@ -1,6 +1,6 @@
-// Copyright shenyizhong@gmail.com, 2014
+// Copyright 2017-2018 SeetaTech
 
-#include "eupulogger.h"
+#include "include/eupulogger.h"
 
 #ifdef WITH_LOG4CXX
 CEupuLogger::CEupuLogger() {

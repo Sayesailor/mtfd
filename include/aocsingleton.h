@@ -1,5 +1,9 @@
-#ifndef MTFD_INCLUDE_AOCSINGLETON_H_
-#define MTFD_INCLUDE_AOCSINGLETON_H_
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
+
+#ifndef INCLUDE_AOCSINGLETON_H_
+#define INCLUDE_AOCSINGLETON_H_
 
 template <class T>
 class IAocSingleton {
@@ -21,12 +25,12 @@ class IAocSingleton {
     }
 
    protected:
-    IAocSingleton(){};
-    ~IAocSingleton(){};
+    IAocSingleton() {}
+    ~IAocSingleton() {}
     static T* instance_;
 };
 
 template <class T>
 T* IAocSingleton<T>::instance_ = 0;
 
-#endif
+#endif  // INCLUDE_AOCSINGLETON_H_

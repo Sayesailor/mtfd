@@ -1,9 +1,12 @@
-// Copyright shenyizhong@gmail.com, 2014
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
 
-#ifndef COMMON_EUPULOGGER_H_
-#define COMMON_EUPULOGGER_H_
+#ifndef INCLUDE_EUPULOGGER_H_
+#define INCLUDE_EUPULOGGER_H_
 
-#ifdef WITHOUTLOG
+#ifndef WITH_LOG4CXX
+#include <string>
 namespace log4cxx {
 class LoggerPtr {};
 }
@@ -22,7 +25,7 @@ class CEupuLogger {
    public:
     CEupuLogger();
 
-    CEupuLogger(const char *path);
+    explicit CEupuLogger(const char *path);
 
     virtual ~CEupuLogger();
 
@@ -40,4 +43,4 @@ class CEupuLogger {
     char szMsg[256];
 };
 
-#endif  // COMMON_EUPULOGGER_H_
+#endif  // INCLUDE_EUPULOGGER_H_

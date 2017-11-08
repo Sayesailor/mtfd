@@ -1,30 +1,38 @@
-#include "config.h"
-#include <fstream>
-#include <eupulogger4system.h>
+// Copyright 2017-2018 SeetaTech
+
+#include "include/config.h"
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
 #ifdef WITH_FILECONF
 #include <json/json.h>
 #endif
+#include "include/eupulogger4system.h"
 
-const static char* THREAD_CNT = "thread_cnt";
-const static char* MULTI_FACE = "multi_face";
-const static char* FACE_CROP = "face_crop";
-const static char* SRC_PATH = "src_path";
-const static char* DEST_PATH = "dest_path";
-const static char* CROP_PATH = "crop_path";
-const static char* IMG_SUFFIX = "img_suffix";
-const static char* MODEL_PATH = "model_path";
-const static char* LOG_PATH = "log_path";
-const static char* MEAN_SHAPE = "mean_shape";
-const static char* FINAL_SZ = "final_sz";
-const static char* PTHFN_LST = "pthfn_lst";
+namespace {
+
+static const char *THREAD_CNT = "thread_cnt";
+static const char *MULTI_FACE = "multi_face";
+static const char *FACE_CROP = "face_crop";
+static const char *SRC_PATH = "src_path";
+static const char *DEST_PATH = "dest_path";
+static const char *CROP_PATH = "crop_path";
+#ifdef IMG_SUFF
+static const char *IMG_SUFFIX = "img_suffix";
+#endif
+static const char *MODEL_PATH = "model_path";
+static const char *LOG_PATH = "log_path";
+static const char *MEAN_SHAPE = "mean_shape";
+static const char *FINAL_SZ = "final_sz";
+static const char *PTHFN_LST = "pthfn_lst";
+
+}  // namespace
 
 Config::Config() {}
 
 Config::~Config() {}
 
-bool Config::init(const std::string& cfg_path) {
+bool Config::init(const std::string &cfg_path) {
     bool ret = false;
     do {
 #ifdef WITH_FILECONF
@@ -52,7 +60,9 @@ bool Config::init(const std::string& cfg_path) {
         cfg_.src_path = v[SRC_PATH].asString();
         cfg_.dest_path = v[DEST_PATH].asString();
         cfg_.crop_path = v[CROP_PATH].asString();
+#ifdef IMG_SUFF
         cfg_.img_suffix = v[IMG_SUFFIX].asString();
+#endif
         cfg_.model_path = v[MODEL_PATH].asString();
         cfg_.log_path = v[LOG_PATH].asString();
         cfg_.mean_shape = v[MEAN_SHAPE].asInt();
@@ -65,7 +75,9 @@ bool Config::init(const std::string& cfg_path) {
         cfg_.src_path = "";
         cfg_.dest_path = "";
         cfg_.crop_path = "";
+#ifdef IMG_SUFF
         cfg_.img_suffix = "png";
+#endif
         cfg_.model_path = "";
         cfg_.log_path = "";
         cfg_.mean_shape = 256;
@@ -84,7 +96,9 @@ void Config::output() {
     printf("%s %s\n", SRC_PATH, cfg_.src_path.c_str());
     printf("%s %s\n", DEST_PATH, cfg_.dest_path.c_str());
     printf("%s %s\n", CROP_PATH, cfg_.crop_path.c_str());
+#ifdef IMG_SUFF
     printf("%s %s\n", IMG_SUFFIX, cfg_.img_suffix.c_str());
+#endif
     printf("%s %s\n", MODEL_PATH, cfg_.model_path.c_str());
     printf("%s %s\n", LOG_PATH, cfg_.log_path.c_str());
     printf("%s %d\n", MEAN_SHAPE, cfg_.mean_shape);

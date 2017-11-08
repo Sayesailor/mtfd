@@ -1,19 +1,19 @@
-// Copyright shenyizhong@gmail.com, 2014
+// Copyright 2017-2018 SeetaTech
 
+#include "include/eupulogger4system.h"
 #include <string.h>
-#include <iostream>
 #include <sys/stat.h>
 #include <sys/types.h>
 #ifdef OS_LINUX
 #include <sys/time.h>
 #include <unistd.h>
 #elif OS_WINDOWS
+#include <stdint.h>
 #include <time.h>
 #include <ws2tcpip.h>
-#include <stdint.h>
 #endif
-#include "eupulogger4system.h"
 #include <stdarg.h>
+#include <iostream>
 #include <string>
 
 #ifdef WITH_LOG4CXX
@@ -23,7 +23,7 @@
 #ifdef OS_WINDOWS
 #define snprintf sprintf_s
 #define vsnprintf vsnprintf_s
-unsigned int gettimeofday(struct timeval *tp, void *tzp) {
+unsigned int gettimeofday(struct timeval *tp, const struct timezone *tzp) {
     time_t clock;
     struct tm tm;
     SYSTEMTIME wtm;
@@ -42,7 +42,7 @@ unsigned int gettimeofday(struct timeval *tp, void *tzp) {
 }
 #endif
 
-CEupuLogger4System *CEupuLogger4System::m_pLogger = NULL;
+CEupuLogger4System *CEupuLogger4System::m_pLogger = nullptr;
 
 std::string ConvertStr2Hex(const char *buf, int32_t buflen) {
     char sbuf[MAX_MSGSIZE * 3];
@@ -56,14 +56,14 @@ std::string ConvertStr2Hex(const char *buf, int32_t buflen) {
     unsigned char ch;
     for (int32_t i = 0; i < buflen; i++) {
         ch = (unsigned char)buf[i];
-        sprintf(sbuf + 3 * i, "%2.2x ", ch);
+        snprintf(sbuf + 3 * i, MAX_MSGSIZE * 3, "%2.2x ", ch);
     }
 
     return std::string(sbuf);
 }
 
 CEupuLogger4System *CEupuLogger4System::CreateInstance(const char *spath) {
-    if (m_pLogger == NULL) {
+    if (m_pLogger == nullptr) {
         m_pLogger = new CEupuLogger4System(spath);
     }
 
@@ -71,7 +71,7 @@ CEupuLogger4System *CEupuLogger4System::CreateInstance(const char *spath) {
 }
 
 CEupuLogger4System *CEupuLogger4System::Logger() {
-    if (m_pLogger == NULL) {
+    if (m_pLogger == nullptr) {
         m_pLogger = new CEupuLogger4System;
     }
 
@@ -79,8 +79,9 @@ CEupuLogger4System *CEupuLogger4System::Logger() {
 }
 
 void CEupuLogger4System::Release() {
-    if (m_pLogger != NULL) {
+    if (m_pLogger != nullptr) {
         delete m_pLogger;
+        m_pLogger = nullptr;
     }
 }
 
@@ -109,11 +110,11 @@ CEupuLogger4System::~CEupuLogger4System() {
 }
 
 void CEupuLogger4System::Fatal4Sys(const std::string &strFatal) {
-    Fatal4Sys((char *)strFatal.c_str());
+    Fatal4Sys(const_cast<char *>(strFatal.c_str()));
 }
 
 void CEupuLogger4System::Fatal4Sys(char *strFatal) {
-    if (strFatal == NULL || m_FtlPtr == NULL) {
+    if (strFatal == nullptr || m_FtlPtr == nullptr) {
         return;
     }
 
@@ -121,11 +122,11 @@ void CEupuLogger4System::Fatal4Sys(char *strFatal) {
 }
 
 void CEupuLogger4System::Error4Sys(const std::string &strError) {
-    Error4Sys((char *)strError.c_str());
+    Error4Sys(const_cast<char *>(strError.c_str()));
 }
 
 void CEupuLogger4System::Error4Sys(char *strError) {
-    if (strError == NULL || m_ErrPtr == NULL) {
+    if (strError == nullptr || m_ErrPtr == nullptr) {
         return;
     }
 
@@ -133,11 +134,11 @@ void CEupuLogger4System::Error4Sys(char *strError) {
 }
 
 void CEupuLogger4System::Debug4Sys(const std::string &strDebug) {
-    Debug4Sys((char *)strDebug.c_str());
+    Debug4Sys(const_cast<char *>(strDebug.c_str()));
 }
 
 void CEupuLogger4System::Debug4Sys(char *strDebug) {
-    if (strDebug == NULL || m_BugPtr == NULL) {
+    if (strDebug == nullptr || m_BugPtr == nullptr) {
         return;
     }
 
@@ -163,7 +164,7 @@ void CEupuLogger4System::WriteLog(const char *filename, int32_t line,
     memset(&tmv, 0, sizeof(tmv));
     memset(&tme, 0, sizeof(tme));
 
-    gettimeofday(&tmv, NULL);
+    gettimeofday(&tmv, nullptr);
 
 // get the log string
 #ifdef OS_LINUX
@@ -234,7 +235,7 @@ void CEupuLogger4System::WriteHex(const char *filename, int32_t line,
     memset(&tmv, 0, sizeof(tmv));
     memset(&tme, 0, sizeof(tme));
 
-    gettimeofday(&tmv, NULL);
+    gettimeofday(&tmv, nullptr);
 
 #ifdef OS_LINUX
     localtime_r(&tmv.tv_sec, &tme);
@@ -290,9 +291,9 @@ const char *CEupuLogger4System::GetLogLevelStr(LOGLEVEL level) {
 }
 #else
 CEupuLogger4System *CEupuLogger4System::CreateInstance(const char *spath) {
-    return NULL;
+    return nullptr;
 }
-CEupuLogger4System *CEupuLogger4System::Logger() { return NULL; }
+CEupuLogger4System *CEupuLogger4System::Logger() { return nullptr; }
 void CEupuLogger4System::Release() {}
 void CEupuLogger4System::Fatal4Sys(const std::string &strFatal) {}
 void CEupuLogger4System::Error4Sys(const std::string &strError) {}
@@ -307,7 +308,7 @@ void CEupuLogger4System::WriteHex(const char *filename, int32_t line,
                                   LOGLEVEL level, const char *title,
                                   const char *buf, int32_t buflen) {}
 void CEupuLogger4System::SetLogLevel(LOGLEVEL level) {}
-const char *CEupuLogger4System::GetLogLevelStr(LOGLEVEL) { return NULL; }
+const char *CEupuLogger4System::GetLogLevelStr(LOGLEVEL) { return nullptr; }
 CEupuLogger4System::CEupuLogger4System() {}
 CEupuLogger4System::CEupuLogger4System(const char *spath) {}
 CEupuLogger4System::~CEupuLogger4System() {}

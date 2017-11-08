@@ -1,7 +1,9 @@
-#include "face_crop.h"
+// Copyright 2017-2018 SeetaTech
 
-#include "alignment.h"
+#include "include/face_crop.h"
+
 #include <memory>
+#include "include/alignment.h"
 
 bool VIPL::FaceMeanShape(VIPLPoint *mean_shape, int num, int *mean_shape_size,
                          int id) {

@@ -1,5 +1,9 @@
-#ifndef MTFD_INCLUDE_AOCLOCK_H_
-#define MTFD_INCLUDE_AOCLOCK_H_
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
+
+#ifndef INCLUDE_AOCLOCK_H_
+#define INCLUDE_AOCLOCK_H_
 
 #include <pthread.h>
 
@@ -14,4 +18,4 @@ class AocLock {
     pthread_mutex_t mutex_;
 };
 
-#endif
+#endif  // INCLUDE_AOCLOCK_H_

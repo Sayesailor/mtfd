@@ -1,12 +1,18 @@
-#ifndef MTFD_SRC_FDTHREAD_H_
-#define MTFD_SRC_FDTHREAD_H_
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
+
+#ifndef INCLUDE_FDTHREAD_H_
+#define INCLUDE_FDTHREAD_H_
 
 #include <opencv2/imgproc/imgproc.hpp>
-#include "workbasethread.h"
-#include "detectionresult.h"
-#include "fd.h"
-#include "face_crop.h"
-#include "config.h"
+#include <string>
+#include <vector>
+#include "include/config.h"
+#include "include/detectionresult.h"
+#include "include/face_crop.h"
+#include "include/fd.h"
+#include "include/workbasethread.h"
 
 class FdThread : public WorkBaseThread {
    public:
@@ -23,7 +29,7 @@ class FdThread : public WorkBaseThread {
    private:
     int do_face_detect();
     void deal_faces_for_each_img(const cv::Mat &mat, const cv::Mat &mat_gray,
-                                 const std::vector<seeta::FaceInfo> &faces,
+                                 const std::vector<VIPLFaceInfo> &faces,
                                  const std::string &fn);
     void do_face_crop(const VIPLImageData &img,
                       const std::vector<VIPLPoint> &pts, const std::string &fn);
@@ -37,4 +43,4 @@ class FdThread : public WorkBaseThread {
     Config *pcfg_;
 };
 
-#endif
+#endif  // INCLUDE_FDTHREAD_H_

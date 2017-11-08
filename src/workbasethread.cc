@@ -1,7 +1,9 @@
-#include <unistd.h>
+// Copyright 2017-2018 SeetaTech
+
+#include "include/workbasethread.h"
 #include <eupulogger4system.h>
-#include "workbasethread.h"
-#include "fd.h"
+#include <unistd.h>
+#include "include/fd.h"
 
 WorkBaseThread::WorkBaseThread() : AocThread() {
     LOG(_INFO_, "WorkBaseThread::WorkBaseThread()");

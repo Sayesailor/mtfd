@@ -1,9 +1,12 @@
-// Copyright shenyizhong@gmail.com, 2014
+/*
+ * Copyright 2017-2018 SeetaTech
+ */
 
-#ifndef LOGGER_EUPULOGGER4SYSTEM_H_
-#define LOGGER_EUPULOGGER4SYSTEM_H_
+#ifndef INCLUDE_EUPULOGGER4SYSTEM_H_
+#define INCLUDE_EUPULOGGER4SYSTEM_H_
 
-#include "eupulogger.h"
+#include <string>
+#include "include/eupulogger.h"
 
 typedef enum {
     LL_ERROR = 1,
@@ -17,7 +20,7 @@ typedef enum {
 #define _INFO_ __FILE__, __LINE__, LL_INFO
 #define _DEBUG_ __FILE__, __LINE__, LL_DEBUG
 
-#define GETNULLPTR(s) (s) == NULL || strlen((s)) <= 0 ? "NULL" : (s)
+#define GETNULLPTR(s) (s) == nullptr || strlen((s)) <= 0 ? "NULL" : (s)
 #define GETNULLSTR(s) (s).empty() ? "NULL" : (s).c_str()
 
 class CEupuLogger4System : public CEupuLogger {
@@ -41,7 +44,7 @@ class CEupuLogger4System : public CEupuLogger {
 
    protected:
     CEupuLogger4System();
-    CEupuLogger4System(const char *spath);
+    explicit CEupuLogger4System(const char *spath);
     virtual ~CEupuLogger4System();
 
    protected:
@@ -56,17 +59,9 @@ class CEupuLogger4System : public CEupuLogger {
     static CEupuLogger4System *m_pLogger;
 };
 
-#ifdef WITHOUTLOG
-
-#define LOGSETLEVEL
-#define LOGSETDEBUG
-#define LOG
-#define LOGHEX
-#else
 #define LOGSETLEVEL CEupuLogger4System::Logger()->SetLogLevel
 #define LOGSETDEBUG CEupuLogger4System::Logger()->SetDebugMode
 #define LOG CEupuLogger4System::Logger()->WriteLog
 #define LOGHEX CEupuLogger4System::Logger()->WriteHex
-#endif
 
-#endif  // LOGGER_EUPULOGGER4SYSTEM_H_
+#endif  // INCLUDE_EUPULOGGER4SYSTEM_H_

@@ -1,7 +1,9 @@
-#include "fdstatistics.h"
+// Copyright 2017-2018 SeetaTech
+
+#include "include/fdstatistics.h"
 #include <cstdio>
 #include <cstdlib>
-#include "config.h"
+#include "include/config.h"
 
 FdStatistics::FdStatistics()
     : src_cnt_(0), dest_cnt_(0), multi_face_cnt_(0), err_cnt_(0) {}
@@ -18,4 +20,11 @@ void FdStatistics::output() {
     printf("total multi faces count %d\n", multi_face_cnt_);
     printf("total error count %d\n", err_cnt_);
     printf("</pre>\n");
+}
+
+void FdStatistics::clear() {
+    src_cnt_ = 0;
+    dest_cnt_ = 0;
+    multi_face_cnt_ = 0;
+    err_cnt_ = 0;
 }
